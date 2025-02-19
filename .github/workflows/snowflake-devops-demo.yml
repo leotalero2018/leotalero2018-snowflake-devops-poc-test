@@ -27,7 +27,7 @@ jobs:
           python --version
           echo "Step 1: Installing schemachange"
           pip install schemachange
-          
+
           echo "Step 2: Running schemachange"
           schemachange \
             --account "fy50488.central-us.azure" \
