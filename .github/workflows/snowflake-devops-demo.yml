@@ -29,7 +29,7 @@ jobs:
           SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
           SF_DATABASE: ${{ secrets.SF_DATABASE }}
           SF_SCHEMA: ${{ secrets.SF_SCHEMA }}
-          SF_AUTHENTICATOR: ${{ secrets.SF_AUTHENTICATOR }}
+          SF_AUTHENTICATOR: "externalbrowser"  
         run: |
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
           python --version
