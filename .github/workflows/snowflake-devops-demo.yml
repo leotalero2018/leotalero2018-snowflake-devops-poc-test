@@ -1,36 +1,39 @@
-name: Deploy to Snowflake
+name: snowflake-devops-demo
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'migrations/**'
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-snowflake-changes-job:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Export Credentials and Run schemachange
+      - name: Use Python 3.8.x
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.8.x
+
+      - name: Run schemachange
         run: |
-          export SF_ACCOUNT="fy50488.central-us.azure"
-          export SF_USERNAME="github_actions_user"
-          export SF_PASSWORD=":3&a493vOqvtxQE8"
-          export SF_ROLE="DATA_TEAM"
-          export SF_WAREHOUSE="PUBLIC_WH"
-          export SF_DATABASE="BIGIRON_WAREHOUSE"
-          export SF_SCHEMA="PUBLIC_DEV"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          python --version
+          echo "Step 1: Installing schemachange"
+          pip install schemachange
 
-          echo "Verifying exported variables..."
-          env | grep SF_
-
-          schemachange -f $GITHUB_WORKSPACE/migrations --create-change-history-table \
-            --account "$SF_ACCOUNT" \
-            --user "$SF_USERNAME" \
-            --password "$SF_PASSWORD" \
-            --role "$SF_ROLE" \
-            --warehouse "$SF_WAREHOUSE" \
-            --database "$SF_DATABASE" \
-            --schema "$SF_SCHEMA"
+          echo "Step 2: Running schemachange"
+          schemachange -f "$GITHUB_WORKSPACE/migrations" --create-change-history-table \
+            --account "fy50488.central-us.azure" \
+            --user "github_actions_user" \
+            --password ":3&a493vOqvtxQE8" \
+            --role "DATA_TEAM" \
+            --warehouse "PUBLIC_WH" \
+            --database "BIGIRON_WAREHOUSE" \
+            --schema "PUBLIC_DEV"
