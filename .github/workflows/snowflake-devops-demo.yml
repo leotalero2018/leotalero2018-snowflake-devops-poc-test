@@ -21,33 +21,52 @@ jobs:
       - name: Install dependencies
         run: pip install schemachange snowflake-connector-python
 
-      - name: Debug environment variables
+      - name: Verificar Variables de Entorno
         run: |
-          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}"
           echo "SF_ACCOUNT=${{ secrets.SF_ACCOUNT }}"
-          echo "SF_ROLE=${{ secrets.SF_ROLE }}"
+          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}"
           echo "SF_DATABASE=${{ secrets.SF_DATABASE }}"
+          echo "SF_ROLE=${{ secrets.SF_ROLE }}"
           echo "SF_SCHEMA=${{ secrets.SF_SCHEMA }}"
-        env:
-          SF_USERNAME: ${{ secrets.SF_USERNAME }}
-          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_ROLE: ${{ secrets.SF_ROLE }}
-          SF_DATABASE: ${{ secrets.SF_DATABASE }}
-          SF_SCHEMA: ${{ secrets.SF_SCHEMA }}
+          echo "SF_WAREHOUSE=${{ secrets.SF_WAREHOUSE }}"
+          echo "SF_PASSWORD=$(if [ -z "${{ secrets.SF_PASSWORD }}" ]; then echo 'VACÍO ❌'; else echo 'OK ✅'; fi)"
+        shell: bash
+
+      - name: Validar Secrets
+        run: |
+          if [ -z "${{ secrets.SF_ACCOUNT }}" ] || 
+             [ -z "${{ secrets.SF_USERNAME }}" ] || 
+             [ -z "${{ secrets.SF_PASSWORD }}" ] || 
+             [ -z "${{ secrets.SF_ROLE }}" ] || 
+             [ -z "${{ secrets.SF_WAREHOUSE }}" ] || 
+             [ -z "${{ secrets.SF_DATABASE }}" ] || 
+             [ -z "${{ secrets.SF_SCHEMA }}" ]; then
+            echo "❌ ERROR: Uno o más secrets están vacíos. Revisa en GitHub Actions -> Secrets and Variables."
+            exit 1
+          fi
+        shell: bash
 
       - name: Create connections.toml
         run: |
-          set -x
-          echo "[connections.snowflake]" > connections.toml
-          echo "account = \"${{ secrets.SF_ACCOUNT }}\"" >> connections.toml
-          echo "user = \"${{ secrets.SF_USERNAME }}\"" >> connections.toml
-          echo "password = \"${{ secrets.SF_PASSWORD }}\"" >> connections.toml
-          echo "role = \"${{ secrets.SF_ROLE }}\"" >> connections.toml
-          echo "warehouse = \"${{ secrets.SF_WAREHOUSE }}\"" >> connections.toml
-          echo "database = \"${{ secrets.SF_DATABASE }}\"" >> connections.toml
-          echo "schema = \"${{ secrets.SF_SCHEMA }}\"" >> connections.toml
+          cat <<EOF > connections.toml
+          [connections.snowflake]
+          account = "${{ secrets.SF_ACCOUNT }}"
+          user = "${{ secrets.SF_USERNAME }}"
+          password = "${{ secrets.SF_PASSWORD }}"
+          role = "${{ secrets.SF_ROLE }}"
+          warehouse = "${{ secrets.SF_WAREHOUSE }}"
+          database = "${{ secrets.SF_DATABASE }}"
+          schema = "${{ secrets.SF_SCHEMA }}"
+          EOF
 
       - name: Run schemachange
         run: |
-          set -x
           schemachange -f $GITHUB_WORKSPACE/migrations --create-change-history-table
+        env:
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SF_ROLE: ${{ secrets.SF_ROLE }}
+          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+          SF_DATABASE: ${{ secrets.SF_DATABASE }}
+          SF_SCHEMA: ${{ secrets.SF_SCHEMA }}
