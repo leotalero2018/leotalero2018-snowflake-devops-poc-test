@@ -1,4 +1,4 @@
-name: snowflake-devops-demo
+name: Deploy to Snowflake
 
 on:
   push:
