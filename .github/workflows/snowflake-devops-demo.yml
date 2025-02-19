@@ -22,12 +22,16 @@ jobs:
         run: pip install schemachange
 
       - name: Run schemachange
+        env:
+          SF_ACCOUNT: "fy50488.central-us.azure"
+          SF_USERNAME: "github_actions_user"
+          SF_PASSWORD: ":3&a493vOqvtxQE8"  # 🔹 NO usar comillas aquí
+          SF_ROLE: "DATA_TEAM"
+          SF_WAREHOUSE: "PUBLIC_WH"
+          SF_DATABASE: "BIGIRON_WAREHOUSE"
+          SF_SCHEMA: "PUBLIC_DEV"
         run: |
-          export SF_ACCOUNT="fy50488.central-us.azure"
-          export SF_USERNAME="github_actions_user"
-          export SF_PASSWORD="':3&a493vOqvtxQE8'"  # 🔹 Comillas simples para YAML y dobles para bash
-          export SF_ROLE="DATA_TEAM"
-          export SF_WAREHOUSE="PUBLIC_WH"
-          export SF_DATABASE="BIGIRON_WAREHOUSE"
-          export SF_SCHEMA="PUBLIC_DEV"
+          echo "Verificando variables de entorno..."
+          echo "SF_USERNAME: $SF_USERNAME"
+          echo "SF_PASSWORD: [OCULTO POR SEGURIDAD]"
           schemachange -f $GITHUB_WORKSPACE/migrations --create-change-history-table
