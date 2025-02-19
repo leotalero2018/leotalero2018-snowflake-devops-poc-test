@@ -1,4 +1,4 @@
-name: Deploy Snowflake Migrations
+name: Deploy to Snowflake
 
 on:
   push:
@@ -10,28 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
+      - name: Debug Environment Variables
+        run: |
+          echo "Checking environment variables..."
+          env | grep SF_
 
-      - name: Install schemachange
-        run: pip install schemachange
+      - name: Set and Export Snowflake Credentials
+        run: |
+          export SF_ACCOUNT="fy50488.central-us.azure"
+          export SF_USERNAME="github_actions_user"
+          export SF_PASSWORD=":3&a493vOqvtxQE8"
+          export SF_ROLE="DATA_TEAM"
+          export SF_WAREHOUSE="PUBLIC_WH"
+          export SF_DATABASE="BIGIRON_WAREHOUSE"
+          export SF_SCHEMA="PUBLIC_DEV"
+
+          echo "Verifying exported variables..."
+          env | grep SF_
 
       - name: Run schemachange
-        env:
-          SF_ACCOUNT: "fy50488.central-us.azure"
-          SF_USERNAME: "github_actions_user"
-          SF_PASSWORD: ":3&a493vOqvtxQE8"  # 🔹 NO usar comillas aquí
-          SF_ROLE: "DATA_TEAM"
-          SF_WAREHOUSE: "PUBLIC_WH"
-          SF_DATABASE: "BIGIRON_WAREHOUSE"
-          SF_SCHEMA: "PUBLIC_DEV"
         run: |
-          echo "Verificando variables de entorno..."
-          echo "SF_USERNAME: $SF_USERNAME"
-          echo "SF_PASSWORD: [OCULTO POR SEGURIDAD]"
-          schemachange -f $GITHUB_WORKSPACE/migrations --create-change-history-table
+          schemachange -f $GITHUB_WORKSPACE/migrations --create-change-history-table \
+            --account fy50488.central-us.azure \
+            --user github_actions_user \
+            --password ':3&a493vOqvtxQE8' \
+            --role DATA_TEAM \
+            --warehouse PUBLIC_WH \
+            --database BIGIRON_WAREHOUSE \
+            --schema PUBLIC_DEV
