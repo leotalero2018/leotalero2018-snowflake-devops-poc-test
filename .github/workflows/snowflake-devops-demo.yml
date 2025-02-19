@@ -21,35 +21,35 @@ jobs:
       - name: Install schemachange
         run: pip install schemachange
 
-      - name: Verificar Secrets en GitHub Actions
+      - name: Verify Secrets in GitHub Actions
         run: |
-          echo "🔍 Verificando secretos..."
-          echo "SF_USERNAME=$(if [ -z "${{ secrets.SF_USERNAME }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
-          echo "SF_PASSWORD=$(if [ -z "${{ secrets.SF_PASSWORD }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
-          echo "SF_ACCOUNT=$(if [ -z "${{ secrets.SF_ACCOUNT }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
-          echo "SF_DATABASE=$(if [ -z "${{ secrets.SF_DATABASE }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
-          echo "SF_ROLE=$(if [ -z "${{ secrets.SF_ROLE }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
-          echo "SF_SCHEMA=$(if [ -z "${{ secrets.SF_SCHEMA }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
-          echo "SF_WAREHOUSE=$(if [ -z "${{ secrets.SF_WAREHOUSE }}" ]; then echo '❌ VACÍO'; else echo '✅ OK'; fi)"
+          echo "🔍 Checking secrets..."
+          echo "SF_USERNAME=$(if [ -z "${{ secrets.SF_USERNAME }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
+          echo "SF_PASSWORD=$(if [ -z "${{ secrets.SF_PASSWORD }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
+          echo "SF_ACCOUNT=$(if [ -z "${{ secrets.SF_ACCOUNT }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
+          echo "SF_DATABASE=$(if [ -z "${{ secrets.SF_DATABASE }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
+          echo "SF_ROLE=$(if [ -z "${{ secrets.SF_ROLE }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
+          echo "SF_SCHEMA=$(if [ -z "${{ secrets.SF_SCHEMA }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
+          echo "SF_WAREHOUSE=$(if [ -z "${{ secrets.SF_WAREHOUSE }}" ]; then echo '❌ EMPTY'; else echo '✅ OK'; fi)"
         shell: bash
 
-      - name: Verificar que SF_USERNAME no esté vacío
+      - name: Verify that SF_USERNAME is not empty
         run: |
           if [ -z "${{ secrets.SF_USERNAME }}" ]; then
-            echo "❌ ERROR: SF_USERNAME está vacío. Revisa los secrets en GitHub."
+            echo "❌ ERROR: SF_USERNAME is empty. Check your GitHub secrets."
             exit 1
           else
-            echo "✅ SF_USERNAME está definido correctamente."
+            echo "✅ SF_USERNAME is correctly set."
           fi
 
       - name: Run schemachange
         run: |
           schemachange -f $GITHUB_WORKSPACE/migrations --create-change-history-table
         env:
-          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_USERNAME: ${{ secrets.SF_USERNAME }}
-          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
-          SF_ROLE: ${{ secrets.SF_ROLE }}
-          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
-          SF_DATABASE: ${{ secrets.SF_DATABASE }}
-          SF_SCHEMA: ${{ secrets.SF_SCHEMA }}
+          SF_ACCOUNT: "fy50488.central-us.azure"
+          SF_USERNAME: "github_actions_user"
+          SF_PASSWORD: ":3&a493vOqvtxQE8"
+          SF_ROLE: "DATA_TEAM"
+          SF_WAREHOUSE: "PUBLIC_WH"
+          SF_DATABASE: "BIGIRON_WAREHOUSE"
+          SF_SCHEMA: "PUBLIC_DEV"
