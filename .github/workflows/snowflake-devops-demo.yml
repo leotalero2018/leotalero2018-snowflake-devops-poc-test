@@ -27,13 +27,14 @@ jobs:
           python --version
           echo "Step 1: Installing schemachange"
           pip install schemachange
-
+          
           echo "Step 2: Running schemachange"
-          schemachange deploy -f "$GITHUB_WORKSPACE/migrations" --create-change-history-table \
+          schemachange \
             --account "fy50488.central-us.azure" \
             --user "github_actions_user" \
             --password ":3&a493vOqvtxQE8" \
             --role "DATA_TEAM" \
             --warehouse "PUBLIC_WH" \
             --database "BIGIRON_WAREHOUSE" \
-            --schema "PUBLIC_DEV"
+            --schema "PUBLIC_DEV" \
+            deploy -f "$GITHUB_WORKSPACE/migrations" --create-change-history-table
