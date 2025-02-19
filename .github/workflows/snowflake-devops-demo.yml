@@ -1,4 +1,4 @@
-name: Deploy to Snowflake using schemachange
+name: snowflake-devops-demo
 
 on:
   push:
