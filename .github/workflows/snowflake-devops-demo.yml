@@ -19,23 +19,28 @@ jobs:
       - name: Use Python 3.8.x
         uses: actions/setup-python@v2.2.1
         with:
-          python-version: 3.8.x
+          python-version: '3.8.x'
 
-      - name: Run schemachange
+      - name: Create connections.toml file
         run: |
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          python --version
-          echo "Step 1: Installing schemachange"
-          pip install schemachange
+          cat <<EOF > connections.toml
+[connections.my_snowflake]
+account = "fy50488.central-us.azure"
+user = "github_actions_user"
+password = ":3&a493vOqvtxQE8"
+role = "DATA_TEAM"
+warehouse = "PUBLIC_WH"
+database = "BIGIRON_WAREHOUSE"
+schema = "PUBLIC_DEV"
+EOF
 
-          echo "Step 2: Running schemachange"
+      - name: Install schemachange
+        run: pip install schemachange
+
+      - name: Run schemachange deploy
+        run: |
           schemachange deploy \
-            --account "fy50488.central-us.azure" \
-            --user "github_actions_user" \
-            --password ":3&a493vOqvtxQE8" \
-            --role "DATA_TEAM" \
-            --warehouse "PUBLIC_WH" \
-            --database "BIGIRON_WAREHOUSE" \
-            --schema "PUBLIC_DEV" \
+            --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
+            --connection-name my_snowflake \
             -f "$GITHUB_WORKSPACE/migrations" \
             --create-change-history-table
