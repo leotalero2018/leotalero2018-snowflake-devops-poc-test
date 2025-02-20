@@ -23,9 +23,22 @@ jobs:
           pip install --upgrade pip
           pip install schemachange snowflake-connector-python
 
+      - name: Create Snowflake connection config
+        run: |
+          cat <<EOF > connections.toml
+          [connections.my_snowflake]
+          account = "tu_cuenta_snowflake"
+          user = "TU_USUARIO"
+          private_key_path = "snowflake_rsa_key.p8"
+          role = "TU_ROLE"
+          warehouse = "TU_WAREHOUSE"
+          database = "TU_DATABASE"
+          schema = "TU_SCHEMA"
+          EOF
+          chmod 600 connections.toml
+
       - name: Save Snowflake Private Key
         run: |
-          echo "Guardando clave privada..."
           cat <<EOF > snowflake_rsa_key.p8
           -----BEGIN ENCRYPTED PRIVATE KEY-----
           MIIFJDBWBgkqhkiG9w0BBQ0wSTAxBgkqhkiG9w0BBQwwJAQQcFGnXAxwJLOA5F+F
@@ -38,20 +51,12 @@ jobs:
           +9pjRPWvpIR5CZojooSKNtH6JD+0deXZ
           -----END ENCRYPTED PRIVATE KEY-----
           EOF
-
           chmod 600 snowflake_rsa_key.p8
-          ls -l snowflake_rsa_key.p8  # Verifica que el archivo existe y tiene permisos correctos
-          echo "SNOWFLAKE_PRIVATE_KEY_PATH=${GITHUB_WORKSPACE}/snowflake_rsa_key.p8" >> $GITHUB_ENV
-
-      - name: Fix permissions on connections.toml
-        run: |
-          chmod 600 connections.toml
-          ls -l connections.toml  # Verifica que el archivo tiene los permisos correctos
 
       - name: Deploy schema changes with schemachange
         run: |
           schemachange deploy \
-            --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
+            --connections-file-path "connections.toml" \
             --connection-name my_snowflake \
-            -f "$GITHUB_WORKSPACE/migrations" \
+            -f "." \
             --create-change-history-table
