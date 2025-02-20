@@ -26,7 +26,7 @@ jobs:
       - name: Create Snowflake connection config
         run: |
           cat <<EOF > connections.toml
-          [connections.my_snowflake]
+          [connections]
           account = "tu_cuenta_snowflake"
           user = "TU_USUARIO"
           private_key_path = "snowflake_rsa_key.p8"
@@ -57,6 +57,6 @@ jobs:
         run: |
           schemachange deploy \
             --connections-file-path "connections.toml" \
-            --connection-name my_snowflake \
+            --connection-name connections \  # Cambiado de 'my_snowflake' a 'connections'
             -f "." \
             --create-change-history-table
