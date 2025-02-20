@@ -1,22 +1,29 @@
-name: Deploy Schema to Snowflake
+name: Deploy Snowflake Changes
 
 on:
   push:
     branches:
-      - main
+      - main  # Cambia esto si usas otra rama principal
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Instalar dependencias
-        run: pip install schemachange snowflake-connector-python
+      - name: Configurar variables de entorno
+        run: |
+          echo "SNOWFLAKE_ACCOUNT=fy50488.central-us.azure" >> $GITHUB_ENV
+          echo "SNOWFLAKE_USER=github_actions_user" >> $GITHUB_ENV
+          echo "SNOWFLAKE_ROLE=DATA_TEAM" >> $GITHUB_ENV
+          echo "SNOWFLAKE_WAREHOUSE=PUBLIC_WH" >> $GITHUB_ENV
+          echo "SNOWFLAKE_DATABASE=BIGIRON_WAREHOUSE" >> $GITHUB_ENV
+          echo "SNOWFLAKE_SCHEMA=PUBLIC_DEV" >> $GITHUB_ENV
+          echo "SNOWFLAKE_PRIVATE_KEY_PATH=$(pwd)/snowflake_rsa_key.p8" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Crear clave privada en el runner
+      - name: Crear clave privada (⚠️ Solo para pruebas)
         run: |
           cat <<EOF > snowflake_rsa_key.p8
           -----BEGIN PRIVATE KEY-----
@@ -51,20 +58,24 @@ jobs:
           chmod 600 snowflake_rsa_key.p8
         shell: bash
 
-      - name: Configurar variables de entorno
+      - name: Instalar dependencias
         run: |
-          echo "SNOWFLAKE_ACCOUNT=fy50488.central-us.azure" >> $GITHUB_ENV
-          echo "SNOWFLAKE_USER=github_actions_user" >> $GITHUB_ENV
-          echo "SNOWFLAKE_PRIVATE_KEY_PATH=$(pwd)/snowflake_rsa_key.p8" >> $GITHUB_ENV
-          echo "SNOWFLAKE_ROLE=DATA_TEAM" >> $GITHUB_ENV
-          echo "SNOWFLAKE_WAREHOUSE=PUBLIC_WH" >> $GITHUB_ENV
-          echo "SNOWFLAKE_DATABASE=BIGIRON_WAREHOUSE" >> $GITHUB_ENV
-          echo "SNOWFLAKE_SCHEMA=PUBLIC_DEV" >> $GITHUB_ENV
-        shell: bash
+          pip install --upgrade pip
+          pip install schemachange snowflake-connector-python
 
+      - name: Verificar variables de entorno
+        run: |
+          echo "Usuario: $SNOWFLAKE_USER"
+          echo "Cuenta: $SNOWFLAKE_ACCOUNT"
+          ls -l snowflake_rsa_key.p8
 
       - name: Ejecutar schemachange
         run: |
           schemachange deploy -f "." \
-            --create-change-history-table \
-            --change-history-table PUBLIC_DEV.CHANGE_HISTORY
+            --snowflake-account $SNOWFLAKE_ACCOUNT \
+            --snowflake-user $SNOWFLAKE_USER \
+            --snowflake-private-key-path $SNOWFLAKE_PRIVATE_KEY_PATH \
+            --snowflake-role $SNOWFLAKE_ROLE \
+            --snowflake-warehouse $SNOWFLAKE_WAREHOUSE \
+            --snowflake-database $SNOWFLAKE_DATABASE \
+            --snowflake-schema $SNOWFLAKE_SCHEMA
