@@ -19,26 +19,36 @@ jobs:
       - name: Crear clave privada en el runner
         run: |
           cat <<EOF > snowflake_rsa_key.p8
-          -----BEGIN RSA PRIVATE KEY-----
-          TU_CLAVE_PRIVADA_AQUÍ
-          -----END RSA PRIVATE KEY-----
+          -----BEGIN PRIVATE KEY-----
+          MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDmH3tovQSHPLWT
+          XRLQ75fJqCtuW8Ig3qKensnB7G5PuWEheNHy9gwVrnGK0lr/KBjz3F6L8qnrQJi6
+          flgr7rhw2nBr3RsRUcbeuvJWCaTfkLE5wBTE/IE5/TxEcNgmuNGjAn5R+EO+9ea2
+          qKf8SHCBiQi44ItrAxxnGoJXX5Q+15w7X1MFVtiqDUQqEAFLSrAJXLPCVOBhMhLO
+          zXR/G4xAvtxsOUTNdKuDLuXoTc1yosDOWa7geJda96xDqDUYqPK0L7dvQy1FY4Yq
+          OR+eArS0UhJAUmdzoB0FZd4slvqtC5t2FYExmNvlJFoizPFi9mF0TL1ZZsJZAG/9
+          7mqCxuArAgMBAAECggEAB3PskMNSYrjeHpQsmFSyI0dNhMj2/A6J0L5OxXeNSQq1
+          cRqTHh3G3WrlZXwTk2DukfNIopqs0yAn8h5GZ8HW+lywuGWUS1bNLIh8cbnlO5JZ
+          kwe8BHczDjg72/GVpodkzrU1dx0lwIkBPFgw/JQyBJf2DtrC2SfkIxiyMPc4+2H7
+          ha4qsA82KyoXTkVH1Ixi2ROFw1jk3vqq4cHrYgD8sxbgHaekkhQhbNqE5PKUfU8K
+          WQFpIgb2v2ylVH/ORY9PIZMSiK7V7C1DW4mjOeG8R6jL4pR49Smsu2wa6dk31cDo
+          8RD4AGNVWuDq7hZpBzLVfO6cOrtRownMOjpW08cycQKBgQD2P0vZxPsL9w7ru0yN
+          mDFCb0BbJdomy5vtLcdXbS6TC36JZEZI9UIU5Iawhn/X27tlaG54uGWYtl/5QjEB
+          UCfIgX/uNW+Pmn9iCzrq4e/tirqRHzWboA4rUoatux5CWLXZdInsUXOrfnzIK0Jz
+          XoaFlj9GoOvGwmifwvt5qatxWwKBgQDvPLOaRZ4MdTVonIaHzV3jYna0St24se0B
+          NowJa2AiRHB7+a+IwOUnmQ4oDvJkUzyNBk1fmCv9FqT/CM5+N6OjENSPTRR+IDmH
+          1NEgG4ry5a2CxcQFV5/ypuP5JeRYNGdIjViN5baeUE7xbl0RVRVBodroW00qdqN7
+          EyOKfoY1cQKBgQDhjTav4LLG0eRz3dqP87BjFr4O/wvj7yoCxKTLmrFHdQbRV+zd
+          FPETbANHG9tr39O1XkOaBeThTWN5T7zNZBscmCmTCpUGJ1C4gGrWDF+U6DZdiQW0
+          Z5Wy7uN3rGZaBSGEbi+LK0xU8AXh32X9gL6dC/MngWyVYSst8w4e8V+c8wKBgEE3
+          4RZraBypTzgHg709xRyZ2RZpWmxhROURw7dFqF1vHuMNPEchntbeqLdO69Fhx54C
+          W9F1oHhMVgqYkgJilJ99lRTDxJRloIlhAOmp2IVDC7wcwcVbD+WMjZV8OPW6w3VJ
+          4xw7xT7/UaYLmh+BfFv6Db1ONoke8o44t3Wn7FphAoGAIqfPw96hSrUsMwPBe532
+          9GNMBUFbboEQ8QD/pwcsCiq59a4sCiY4/bdhbKbGd7LxGvvshYu1ZYsWbqqZih9q
+          56/ECRT5npRpab+5wt/nKr8XWS/g+HFqmnJTu5tfFASwxVCU4bJf7mjVKWQ6o5qa
+          G30XjuHPYFsVJ2DwoVFiBy8=
+          -----END PRIVATE KEY-----
           EOF
           chmod 600 snowflake_rsa_key.p8
-        shell: bash
-
-      - name: Crear clave pública en el runner
-        run: |
-          cat <<EOF > snowflake_rsa_key.pub
-          -----BEGIN PUBLIC KEY-----
-          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5h97aL0Ehzy1k10S0O+X
-          yagrblvCIN6inp7JwexuT7lhIXjR8vYMFa5xitJa/ygY89xei/Kp60CYun5YK+64
-          cNpwa90bEVHG3rryVgmk35CxOcAUxPyBOf08RHDYJrjRowJ+UfhDvvXmtqin/Ehw
-          gYkIuOCLawMcZxqCV1+UPtecO19TBVbYqg1EKhABS0qwCVyzwlTgYTISzs10fxuM
-          QL7cbDlEzXSrgy7l6E3NcqLAzlmu4HiXWvesQ6g1GKjytC+3b0MtRWOGKjkfngK0
-          tFISQFJnc6AdBWXeLJb6rQubdhWBMZjb5SRaIszxYvZhdEy9WWbCWQBv/e5qgsbg
-          KwIDAQAB
-          -----END PUBLIC KEY-----
-          EOF
         shell: bash
 
       - name: Crear archivo de conexión
@@ -55,11 +65,13 @@ jobs:
           EOF
         shell: bash
 
+      - name: Validar clave privada
+        run: openssl rsa -in snowflake_rsa_key.p8 -check
+        shell: bash
+
       - name: Ejecutar schemachange
         run: |
-          schemachange --connections-file-path "connections.toml" \
-            --connection-name connections \
-            --private-key-path "snowflake_rsa_key.p8" \
+          schemachange --config-file "connections.toml" \
             -f "." \
             --create-change-history-table
         shell: bash
