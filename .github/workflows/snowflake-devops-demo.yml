@@ -1,49 +1,70 @@
-name: Deploy Snowflake Schema Changes
+name: snowflake-devops-demo
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-snowflake-changes-job:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Use Python 3.8.x
+        uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: '3.8.x'
 
       - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install schemachange snowflake-connector-python
+        run: pip install schemachange snowflake-connector-python
 
-      - name: Create Snowflake connection config
+      - name: Create connections.toml
         run: |
           cat <<EOF > connections.toml
           [connections]
-          account = "tu_cuenta_snowflake"
-          user = "TU_USUARIO"
+          account = "fy50488.central-us.azure"
+          user = "github_actions_user"
           private_key_path = "snowflake_rsa_key.p8"
-          role = "TU_ROLE"
-          warehouse = "TU_WAREHOUSE"
-          database = "TU_DATABASE"
-          schema = "TU_SCHEMA"
+          role = "DATA_TEAM"
+          warehouse = "PUBLIC_WH"
+          database = "BIGIRON_WAREHOUSE"
+          schema = "PUBLIC_DEV"
           EOF
-          chmod 600 connections.toml
 
-      - name: Save Snowflake Private Key
+      - name: Set correct permissions for connections.toml
+        run: chmod 600 connections.toml
+
+      - name: Create Snowflake Private Key File
         run: |
           cat <<EOF > snowflake_rsa_key.p8
           -----BEGIN ENCRYPTED PRIVATE KEY-----
           MIIFJDBWBgkqhkiG9w0BBQ0wSTAxBgkqhkiG9w0BBQwwJAQQcFGnXAxwJLOA5F+F
           4XnS8AICCAAwDAYIKoZIhvcNAgkFADAUBggqhkiG9w0DBwQIxZMwHVsjOcoEggTI
-          ...
+          z5k97nXyGi60FLsIGA3lyZS18EMqsNjX2TDtUCzmVqs0EykCnq6ykxJ1f8AxmQR3
+          QLhkdFgF4q2mr4zjJEEhRc1q047QsntB8nP0CpySHSTSp+96LIVAgj1bQJ5Gqxfa
+          xO3iaSxWUpjJzVnJp2+rD4Q9cGzoZU91zBKfG0wJ5vdyZTdkKCsMxnZLQPRAbqHL
+          Sl1yEdhxEHyvyOOYs0kkzFvp/m9EWO3lwJtxCzI9RYTBeLQ6QW7mwaY8WHFLi+vO
+          mbiiNlFONjEZgcX/OTtqtrZZT2lg+dZ2F/pcEs2y13FZqkL3gWKVmicNMYRVW6Rg
+          lpUQqK6zHodWqTCUZ/fMpnGLbSu0sSxU3QWGJUkONGGxjh7/j1QAcr75uTgyNd27
+          gTXLFlZUbl5/HswlC2h35Y7SuLIfAeEvIhj/fd8UFvMtR0edZ1dX76/vro8Yfhk1
+          xf9qSxsSS9CkaJGIBhkeirLAjX/JKsLc6oCrI3Mdj1+SbQ1sEfOkflNDkgjTmtAJ
+          C1vKs0HcHN+9+BLAOzRq9STsMt7vkxvo7+pEisO7GUQZ386mL81HUzDsw7T9LbwJ
+          Vvdv9qHNYJ/g81wuDYEkIcW79rH9KDXpcdsclezGaB2hmiPmrLslW6x6cafaWBCa
+          ozF1CAWbtCuwH75rOk/61mVfqICZn4GtaMwwp6Dd4g86Ic/hC20a7ZrlMLg2ROv1
+          QdI+Dg58AnE0MFRvIM7VnGfaiM5IXecqLi3mDzp4rLtwsy++s5K6l0RLa8vNT/wS
+          N9SiJ//ofXR3JLtzr+Q468UXyXitbWx8z8qJ7JmFRxE176WwOdiJWKIWGkZTQo0s
+          vp03b1t0p+j3DvGAYYOJhl4P6OeH9P4Kw/ypxSTl4OETDldmc2OUUXGEqzeuBCrL
+          kMtgx+PQ+5LX+FuMLX10EcjBQg9BnSS5DTHFsP2kvMzq0lvD3ZRY8Dp8sh6Vuo+M
+          8qSqjKAq2jxDB72AhTkzy3RwE6ZDq5J+iw2PIljQQSePq6NNf0X9GG9bRj8YoRVl
+          bvET0jTlGzCXgpg3BMdqICiZHmlti0ExCVMOHg5ItF178f7sN5GInLx5thdWDb1e
+          v/b5Dxwj6ZIjZ2Z7LqTeqnYnyS8oI1fS0OCRfdq1OoZBUbxR+DrJCPRhDTxsJo+F
+          jUoqGZjxhxi+aRljXG+5TdPImSeI7rB76kOlVkKbrxsow/WkdkVHZKI+XPCyVdbw
+          P2zMJ+skhnzAwVFrJxIybtDM+iNLjaW9zfE1s/XBBqwGitrmBbt2BnjAcOww+Rf+
+          /gQM6yl6S2ERiLOtLNa9wtRXeK2vbTCliaHDflRGkLphTqeK3HzXJeKLDWHyfcEV
           9WeLYjGUGnmhBk5mCn2VPP59X1Bzwu0m5RywwBbTcbObNmegCXfg97bvupqqjgUZ
           LBL/XVg18BpwN7KDAbCXXgjlNqDVYNa7BSTVI3/2+dP6W2SR/21r1NlyWRGFwAdI
           fo/xZ6SA7SohEbUYPYeL44yLAkIoIpKdiOOD6nrbdCxvCn3b881qexKElUr9AHXA
@@ -51,12 +72,13 @@ jobs:
           +9pjRPWvpIR5CZojooSKNtH6JD+0deXZ
           -----END ENCRYPTED PRIVATE KEY-----
           EOF
-          chmod 600 snowflake_rsa_key.p8
+
+      - name: Set correct permissions for Snowflake private key
+        run: chmod 600 snowflake_rsa_key.p8
 
       - name: Deploy schema changes with schemachange
         run: |
-          schemachange deploy \
-            --connections-file-path "connections.toml" \
-            --connection-name connections \  # Cambiado de 'my_snowflake' a 'connections'
+          schemachange --connections-file-path "connections.toml" \
+            --connection-name connections \
             -f "." \
             --create-change-history-table
