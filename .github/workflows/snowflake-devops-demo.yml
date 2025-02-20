@@ -51,24 +51,18 @@ jobs:
           chmod 600 snowflake_rsa_key.p8
         shell: bash
 
-      - name: Crear archivo de configuración YAML
+      - name: Crear archivo de configuración para Snowflake
         run: |
           cat <<EOF > config.yml
-          connections:
-            default:
-              account: fy50488.central-us.azure
-              user: github_actions_user
-              private_key_path: snowflake_rsa_key.p8
-              role: DATA_TEAM
-              warehouse: PUBLIC_WH
-              database: BIGIRON_WAREHOUSE
-              schema: PUBLIC_DEV
+          account: fy50488.central-us.azure
+          user: github_actions_user
+          private_key_path: snowflake_rsa_key.p8
+          role: DATA_TEAM
+          warehouse: PUBLIC_WH
+          database: BIGIRON_WAREHOUSE
+          schema: PUBLIC_DEV
           change_history_table: PUBLIC_DEV.CHANGE_HISTORY
           EOF
-        shell: bash
-
-      - name: Validar clave privada
-        run: openssl rsa -in snowflake_rsa_key.p8 -check
         shell: bash
 
       - name: Ejecutar schemachange
