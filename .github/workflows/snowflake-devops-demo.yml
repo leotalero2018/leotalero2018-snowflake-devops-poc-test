@@ -51,15 +51,19 @@ jobs:
           chmod 600 snowflake_rsa_key.p8
         shell: bash
 
+      - name: Configurar variables de entorno
+        run: |
+          echo "SNOWFLAKE_ACCOUNT=fy50488.central-us.azure" >> $GITHUB_ENV
+          echo "SNOWFLAKE_USER=github_actions_user" >> $GITHUB_ENV
+          echo "SNOWFLAKE_PRIVATE_KEY_PATH=$(pwd)/snowflake_rsa_key.p8" >> $GITHUB_ENV
+          echo "SNOWFLAKE_ROLE=DATA_TEAM" >> $GITHUB_ENV
+          echo "SNOWFLAKE_WAREHOUSE=PUBLIC_WH" >> $GITHUB_ENV
+          echo "SNOWFLAKE_DATABASE=BIGIRON_WAREHOUSE" >> $GITHUB_ENV
+          echo "SNOWFLAKE_SCHEMA=PUBLIC_DEV" >> $GITHUB_ENV
+        shell: bash
+
       - name: Ejecutar schemachange
         run: |
-          schemachange -f "." \
-            --account fy50488.central-us.azure \
-            --user github_actions_user \
-            --private-key-path snowflake_rsa_key.p8 \
-            --role DATA_TEAM \
-            --warehouse PUBLIC_WH \
-            --database BIGIRON_WAREHOUSE \
-            --schema PUBLIC_DEV \
-            --change-history-table PUBLIC_DEV.CHANGE_HISTORY \
-            --create-change-history-table
+          schemachange deploy -f "." \
+            --create-change-history-table \
+            --change-history-table PUBLIC_DEV.CHANGE_HISTORY
