@@ -32,8 +32,7 @@ role = "DATA_TEAM"
 warehouse = "PUBLIC_WH"
 database = "BIGIRON_WAREHOUSE"
 schema = "PUBLIC_DEV"
-EOF
-
+EOF 
       - name: Install schemachange
         run: pip install schemachange
 
