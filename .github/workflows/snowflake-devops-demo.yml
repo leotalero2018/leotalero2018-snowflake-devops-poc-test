@@ -62,6 +62,7 @@ jobs:
           echo "SNOWFLAKE_SCHEMA=PUBLIC_DEV" >> $GITHUB_ENV
         shell: bash
 
+
       - name: Ejecutar schemachange
         run: |
           schemachange deploy -f "." \
