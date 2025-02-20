@@ -17,24 +17,46 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Use Python 3.8.x
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.8.x'
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install schemachange
+          pip install snowflake-connector-python cryptography
+
+      - name: Save Snowflake Private Key
+        run: |
+          echo "Guardando clave privada..."
+          cat <<EOF > snowflake_rsa_key.p8
+          -----BEGIN ENCRYPTED PRIVATE KEY-----
+          MIIFJDBWBgkqhkiG9w0BBQ0wSTAxBgkqhkiG9w0BBQwwJAQQcFGnXAxwJLOA5F+F
+          4XnS8AICCAAwDAYIKoZIhvcNAgkFADAUBggqhkiG9w0DBwQIxZMwHVsjOcoEggTI
+          z5k97nXyGi60FLsIGA3lyZS18EMqsNjX2TDtUCzmVqs0EykCnq6ykxJ1f8AxmQR3
+          ...
+          9WeLYjGUGnmhBk5mCn2VPP59X1Bzwu0m5RywwBbTcbObNmegCXfg97bvupqqjgUZ
+          LBL/XVg18BpwN7KDAbCXXgjlNqDVYNa7BSTVI3/2+dP6W2SR/21r1NlyWRGFwAdI
+          fo/xZ6SA7SohEbUYPYeL44yLAkIoIpKdiOOD6nrbdCxvCn3b881qexKElUr9AHXA
+          cnijDw4IjvWW5n8b8xHXr3W4upQv/sDnLL/gYp0PEhiG0CbyXl9cFeYW8xWER6ig
+          +9pjRPWvpIR5CZojooSKNtH6JD+0deXZ
+          -----END ENCRYPTED PRIVATE KEY-----
+          EOF
+
+          chmod 600 snowflake_rsa_key.p8
+          echo "SNOWFLAKE_PRIVATE_KEY_PATH=${GITHUB_WORKSPACE}/snowflake_rsa_key.p8" >> $GITHUB_ENV
 
       - name: Create connections.toml
         run: |
-          # Write each line of the TOML via echo statements
           echo "[my_snowflake]"                                  >  connections.toml
           echo "account = \"fy50488.central-us.azure\""          >> connections.toml
           echo "user = \"github_actions_user\""                  >> connections.toml
-          echo "password = \":3&a493vOqvtxQE8\""                 >> connections.toml
+          echo "authenticator = \"snowflake_jwt\""               >> connections.toml
+          echo "private_key_path = \"${GITHUB_WORKSPACE}/snowflake_rsa_key.p8\"" >> connections.toml
           echo "role = \"DATA_TEAM\""                            >> connections.toml
           echo "warehouse = \"PUBLIC_WH\""                       >> connections.toml
           echo "database = \"BIGIRON_WAREHOUSE\""                >> connections.toml
           echo "schema = \"PUBLIC_DEV\""                         >> connections.toml
-
-      - name: Install schemachange
-        run: pip install schemachange
 
       - name: Run schemachange deploy
         run: |
