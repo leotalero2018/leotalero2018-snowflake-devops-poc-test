@@ -54,13 +54,15 @@ jobs:
       - name: Crear archivo de configuración YAML
         run: |
           cat <<EOF > config.yml
-          account: fy50488.central-us.azure
-          user: github_actions_user
-          private_key_path: snowflake_rsa_key.p8
-          role: DATA_TEAM
-          warehouse: PUBLIC_WH
-          database: BIGIRON_WAREHOUSE
-          schema: PUBLIC_DEV
+          connections:
+            default:
+              account: fy50488.central-us.azure
+              user: github_actions_user
+              private_key_path: snowflake_rsa_key.p8
+              role: DATA_TEAM
+              warehouse: PUBLIC_WH
+              database: BIGIRON_WAREHOUSE
+              schema: PUBLIC_DEV
           change_history_table: PUBLIC_DEV.CHANGE_HISTORY
           EOF
         shell: bash
