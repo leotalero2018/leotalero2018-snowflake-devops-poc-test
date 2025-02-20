@@ -1,4 +1,4 @@
-name: Deploy Snowflake Schema
+name: Deploy to Snowflake
 
 on:
   push:
@@ -10,15 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Instalar dependencias
-        run: pip install schemachange snowflake-connector-python
+      - name: Install schemachange
+        run: pip install schemachange
 
-      - name: Crear clave privada
+      - name: Crear archivo de clave privada
         run: |
-          echo "-----BEGIN PRIVATE KEY-----
+          cat <<EOF > snowflake_rsa_key.p8
+          -----BEGIN PRIVATE KEY-----
           MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDmH3tovQSHPLWT
           XRLQ75fJqCtuW8Ig3qKensnB7G5PuWEheNHy9gwVrnGK0lr/KBjz3F6L8qnrQJi6
           flgr7rhw2nBr3RsRUcbeuvJWCaTfkLE5wBTE/IE5/TxEcNgmuNGjAn5R+EO+9ea2
@@ -44,15 +45,16 @@ jobs:
           4xw7xT7/UaYLmh+BfFv6Db1ONoke8o44t3Wn7FphAoGAIqfPw96hSrUsMwPBe532
           9GNMBUFbboEQ8QD/pwcsCiq59a4sCiY4/bdhbKbGd7LxGvvshYu1ZYsWbqqZih9q
           56/ECRT5npRpab+5wt/nKr8XWS/g+HFqmnJTu5tfFASwxVCU4bJf7mjVKWQ6o5qa
-          G30XjuHPYFsVJ2DwoVFiBy8=" > snowflake_rsa_key.p8
+          G30XjuHPYFsVJ2DwoVFiBy8=
+          -----END PRIVATE KEY-----
+          EOF
 
       - name: Ejecutar schemachange
-        run: |
-          schemachange deploy -f "." \
-            --snowflake-account fy50488.central-us.azure \
-            --snowflake-user github_actions_user \
-            --snowflake-role DATA_TEAM \
-            --snowflake-warehouse PUBLIC_WH \
-            --snowflake-database BIGIRON_WAREHOUSE \
-            --snowflake-schema PUBLIC_DEV \
-            --snowflake-private-key-path snowflake_rsa_key.p8
+        env:
+          SNOWFLAKE_ACCOUNT: "fy50488.central-us.azure"
+          SNOWFLAKE_USER: "github_actions_user"
+          SNOWFLAKE_ROLE: "DATA_TEAM"
+          SNOWFLAKE_WAREHOUSE: "PUBLIC_WH"
+          SNOWFLAKE_DATABASE: "BIGIRON_WAREHOUSE"
+          SNOWFLAKE_SCHEMA: "PUBLIC_DEV"
+        run: schemachange deploy -f "."
