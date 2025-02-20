@@ -1,30 +1,27 @@
-name: snowflake-devops-demo
+name: Deploy Snowflake Schema Changes
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'migrations/**'
-  workflow_dispatch:
 
 jobs:
-  deploy-snowflake-changes-job:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Use Python 3.8.x
-        uses: actions/setup-python@v2
+      - name: Set up Python
+        uses: actions/setup-python@v3
         with:
-          python-version: '3.8'
+          python-version: "3.8"
 
       - name: Install dependencies
         run: |
-          pip install schemachange
-          pip install snowflake-connector-python cryptography
+          pip install --upgrade pip
+          pip install schemachange snowflake-connector-python
 
       - name: Save Snowflake Private Key
         run: |
@@ -33,7 +30,6 @@ jobs:
           -----BEGIN ENCRYPTED PRIVATE KEY-----
           MIIFJDBWBgkqhkiG9w0BBQ0wSTAxBgkqhkiG9w0BBQwwJAQQcFGnXAxwJLOA5F+F
           4XnS8AICCAAwDAYIKoZIhvcNAgkFADAUBggqhkiG9w0DBwQIxZMwHVsjOcoEggTI
-          z5k97nXyGi60FLsIGA3lyZS18EMqsNjX2TDtUCzmVqs0EykCnq6ykxJ1f8AxmQR3
           ...
           9WeLYjGUGnmhBk5mCn2VPP59X1Bzwu0m5RywwBbTcbObNmegCXfg97bvupqqjgUZ
           LBL/XVg18BpwN7KDAbCXXgjlNqDVYNa7BSTVI3/2+dP6W2SR/21r1NlyWRGFwAdI
@@ -44,21 +40,15 @@ jobs:
           EOF
 
           chmod 600 snowflake_rsa_key.p8
+          ls -l snowflake_rsa_key.p8  # Verifica que el archivo existe y tiene permisos correctos
           echo "SNOWFLAKE_PRIVATE_KEY_PATH=${GITHUB_WORKSPACE}/snowflake_rsa_key.p8" >> $GITHUB_ENV
 
-      - name: Create connections.toml
+      - name: Fix permissions on connections.toml
         run: |
-          echo "[my_snowflake]"                                  >  connections.toml
-          echo "account = \"fy50488.central-us.azure\""          >> connections.toml
-          echo "user = \"github_actions_user\""                  >> connections.toml
-          echo "authenticator = \"snowflake_jwt\""               >> connections.toml
-          echo "private_key_path = \"${GITHUB_WORKSPACE}/snowflake_rsa_key.p8\"" >> connections.toml
-          echo "role = \"DATA_TEAM\""                            >> connections.toml
-          echo "warehouse = \"PUBLIC_WH\""                       >> connections.toml
-          echo "database = \"BIGIRON_WAREHOUSE\""                >> connections.toml
-          echo "schema = \"PUBLIC_DEV\""                         >> connections.toml
+          chmod 600 connections.toml
+          ls -l connections.toml  # Verifica que el archivo tiene los permisos correctos
 
-      - name: Run schemachange deploy
+      - name: Deploy schema changes with schemachange
         run: |
           schemachange deploy \
             --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
