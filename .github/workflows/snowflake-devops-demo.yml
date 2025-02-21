@@ -31,7 +31,7 @@ jobs:
           echo "warehouse = \"PUBLIC_WH\""                       >> connections.toml
           echo "database = \"BIGIRON_WAREHOUSE\""                >> connections.toml
           echo "schema = \"PUBLIC_DEV\""                         >> connections.toml
-          echo "private_key = \":3&a493vOqvtxQE8\""                 >> connections.toml
+          echo private_key = "${{ secrets.SF_PRIVATE_KEY }}""                 >> connections.toml
 
       - name: Install schemachange
         run: pip install schemachange
