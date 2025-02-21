@@ -61,6 +61,8 @@ jobs:
             --snowflake-schema PUBLIC_DEV \
             --verbose
 
+      - name: Clear schemachange cache
+        run: rm -rf ~/.schemachange
 
             
             
