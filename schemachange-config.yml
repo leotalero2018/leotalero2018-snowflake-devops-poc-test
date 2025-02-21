@@ -1,0 +1,28 @@
+config-version: 1
+
+# Root directory where the SQL change scripts are located
+root-folder: "$GITHUB_WORKSPACE/deploy"
+
+# Connections file path
+connections-file-path: "$GITHUB_WORKSPACE/connections.toml"
+
+# Connection name in the TOML file
+connection-name: "my_snowflake"
+
+# Change history table (replace METADATA with your correct schema)
+change-history-table: "BIGIRON_WAREHOUSE.PUBLIC_DEV.CHANGE_HISTORY"
+
+# Variables for the scripts
+vars: {}
+
+# Prevent recreating the table if it already exists
+create-change-history-table: false
+
+# Enable more logs for debugging
+verbose: true
+
+# Test mode (must be false to execute real changes)
+dry-run: false
+
+# Tag for Snowflake auditing
+query-tag: "Snowflake CI/CD Deploy"
