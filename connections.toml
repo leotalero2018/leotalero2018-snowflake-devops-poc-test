@@ -2,7 +2,7 @@
 account = "fy50488.central-us.azure"
 user = "github_actions_user"
 private_key = "${{ secrets.SF_PRIVATE_KEY }}"
-role = "github_actions_user"
+role = "GITHUB_ACTIONS_ROLEr"
 warehouse = "PUBLIC_WH"
 database = "BIGIRON_WAREHOUSE"
 schema= "PUBLIC_DEV"
