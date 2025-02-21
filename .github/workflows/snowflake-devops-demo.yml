@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'migrations/**'
+      - 'deploy/**'
   workflow_dispatch:
 
 jobs:
@@ -41,5 +41,5 @@ jobs:
           schemachange deploy \
             --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
             --connection-name my_snowflake \
-            -f "$GITHUB_WORKSPACE/migrations" \
+            -f "$GITHUB_WORKSPACE/deploy" \
             --create-change-history-table
