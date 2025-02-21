@@ -49,12 +49,17 @@ jobs:
           -----END PRIVATE KEY-----
           EOF
 
+      - name: Dar permisos a la clave privada
+        run: chmod 600 snowflake_rsa_key.p8
+
       - name: Ejecutar schemachange
         env:
           SNOWFLAKE_ACCOUNT: "fy50488.central-us.azure"
           SNOWFLAKE_USER: "github_actions_user"
-          SNOWFLAKE_ROLE: "DATA_TEAM"
+          SNOWFLAKE_ROLE: "GITHUB_ACTIONS_ROLE"
           SNOWFLAKE_WAREHOUSE: "PUBLIC_WH"
           SNOWFLAKE_DATABASE: "BIGIRON_WAREHOUSE"
           SNOWFLAKE_SCHEMA: "PUBLIC_DEV"
+          SNOWFLAKE_PRIVATE_KEY_PATH: "snowflake_rsa_key.p8"
         run: schemachange deploy -f "."
+
