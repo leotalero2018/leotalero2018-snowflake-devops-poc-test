@@ -53,4 +53,5 @@ jobs:
             --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
             --connection-name my_snowflake \
             -f "$GITHUB_WORKSPACE/deploy" \
-            --change-history-table
+            --change-history-table BIGIRON_WAREHOUSE.PUBLIC_DEV.CHANGE_HISTORY \
+            --verbose
