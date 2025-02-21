@@ -27,7 +27,7 @@ jobs:
           echo "[my_snowflake]"                                  >  connections.toml
           echo "account = \"fy50488.central-us.azure\""          >> connections.toml
           echo "user = \"github_actions_user\""                  >> connections.toml
-          echo "role = \"DATA_TEAM\""                            >> connections.toml
+          echo "role = \"GITHUB_ACTIONS_ROLE\""                            >> connections.toml
           echo "warehouse = \"PUBLIC_WH\""                       >> connections.toml
           echo "database = \"BIGIRON_WAREHOUSE\""                >> connections.toml
           echo "schema = \"PUBLIC_DEV\""                         >> connections.toml
