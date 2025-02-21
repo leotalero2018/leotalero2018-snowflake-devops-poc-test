@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - 'deploy/**'
-
-  # Permite lanzar el workflow manualmente desde la pestaña de Actions
   workflow_dispatch:
 
 jobs:
@@ -15,33 +13,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Descarga el código del repositorio
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # 2. Configura Python 3.8.x
       - name: Use Python 3.8.x
         uses: actions/setup-python@v2.2.1
         with:
           python-version: 3.8.x
 
-      # 3. Crea un archivo temporal con la clave privada
-      - name: Prepare private key
-        env:
-          SF_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
-        run: |
-          echo "$SF_PRIVATE_KEY" > private_key.p8
-          # Ajustamos permisos para que sólo el usuario actual pueda leerlo
-          chmod 600 private_key.p8
-
-      # 4. Ejecuta schemachange usando la clave privada en lugar de la contraseña
-      - name: Run schemachange
+      - name: Run schemachange with private key
         env:
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
           SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SF_ROLE: ${{ secrets.SF_ROLE }}
           SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
           SF_DATABASE: ${{ secrets.SF_DATABASE }}
+          SF_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
         run: |
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
           python --version
@@ -49,13 +36,10 @@ jobs:
           pip install schemachange
           
           echo "Step 2: Running schemachange with private key"
-          schemachange \
-            -f $GITHUB_WORKSPACE/deploy \
-            -a $SF_ACCOUNT \
-            -u $SF_USERNAME \
-            -r $SF_ROLE \
-            -w $SF_WAREHOUSE \
-            -d $SF_DATABASE \
+          echo "${SF_PRIVATE_KEY}" > private_key.p8
+          schemachange -f $GITHUB_WORKSPACE/deploy \
+            -a $SF_ACCOUNT -u $SF_USERNAME -r $SF_ROLE \
+            -w $SF_WAREHOUSE -d $SF_DATABASE \
             --snowflake-private-key-path private_key.p8 \
             -c $SF_DATABASE.SCHEMACHANGE.CHANGE_HISTORY \
             --create-change-history-table
