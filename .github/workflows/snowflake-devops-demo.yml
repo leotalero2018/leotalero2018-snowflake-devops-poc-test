@@ -1,65 +1,61 @@
-name: Deploy to Snowflake
+name: snowflake-migration-demo
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'deploy/**'
+
+  # Permite lanzar el workflow manualmente desde la pestaña de Actions
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-snowflake-changes-job:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Descarga el código del repositorio
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Install schemachange
-        run: pip install schemachange
+      # 2. Configura Python 3.8.x
+      - name: Use Python 3.8.x
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.8.x
 
-      - name: Crear archivo de clave privada
-        run: |
-          cat <<EOF > snowflake_rsa_key.p8
-          -----BEGIN PRIVATE KEY-----
-          MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDmH3tovQSHPLWT
-          XRLQ75fJqCtuW8Ig3qKensnB7G5PuWEheNHy9gwVrnGK0lr/KBjz3F6L8qnrQJi6
-          flgr7rhw2nBr3RsRUcbeuvJWCaTfkLE5wBTE/IE5/TxEcNgmuNGjAn5R+EO+9ea2
-          qKf8SHCBiQi44ItrAxxnGoJXX5Q+15w7X1MFVtiqDUQqEAFLSrAJXLPCVOBhMhLO
-          zXR/G4xAvtxsOUTNdKuDLuXoTc1yosDOWa7geJda96xDqDUYqPK0L7dvQy1FY4Yq
-          OR+eArS0UhJAUmdzoB0FZd4slvqtC5t2FYExmNvlJFoizPFi9mF0TL1ZZsJZAG/9
-          7mqCxuArAgMBAAECggEAB3PskMNSYrjeHpQsmFSyI0dNhMj2/A6J0L5OxXeNSQq1
-          cRqTHh3G3WrlZXwTk2DukfNIopqs0yAn8h5GZ8HW+lywuGWUS1bNLIh8cbnlO5JZ
-          kwe8BHczDjg72/GVpodkzrU1dx0lwIkBPFgw/JQyBJf2DtrC2SfkIxiyMPc4+2H7
-          ha4qsA82KyoXTkVH1Ixi2ROFw1jk3vqq4cHrYgD8sxbgHaekkhQhbNqE5PKUfU8K
-          WQFpIgb2v2ylVH/ORY9PIZMSiK7V7C1DW4mjOeG8R6jL4pR49Smsu2wa6dk31cDo
-          8RD4AGNVWuDq7hZpBzLVfO6cOrtRownMOjpW08cycQKBgQD2P0vZxPsL9w7ru0yN
-          mDFCb0BbJdomy5vtLcdXbS6TC36JZEZI9UIU5Iawhn/X27tlaG54uGWYtl/5QjEB
-          UCfIgX/uNW+Pmn9iCzrq4e/tirqRHzWboA4rUoatux5CWLXZdInsUXOrfnzIK0Jz
-          XoaFlj9GoOvGwmifwvt5qatxWwKBgQDvPLOaRZ4MdTVonIaHzV3jYna0St24se0B
-          NowJa2AiRHB7+a+IwOUnmQ4oDvJkUzyNBk1fmCv9FqT/CM5+N6OjENSPTRR+IDmH
-          1NEgG4ry5a2CxcQFV5/ypuP5JeRYNGdIjViN5baeUE7xbl0RVRVBodroW00qdqN7
-          EyOKfoY1cQKBgQDhjTav4LLG0eRz3dqP87BjFr4O/wvj7yoCxKTLmrFHdQbRV+zd
-          FPETbANHG9tr39O1XkOaBeThTWN5T7zNZBscmCmTCpUGJ1C4gGrWDF+U6DZdiQW0
-          Z5Wy7uN3rGZaBSGEbi+LK0xU8AXh32X9gL6dC/MngWyVYSst8w4e8V+c8wKBgEE3
-          4RZraBypTzgHg709xRyZ2RZpWmxhROURw7dFqF1vHuMNPEchntbeqLdO69Fhx54C
-          W9F1oHhMVgqYkgJilJ99lRTDxJRloIlhAOmp2IVDC7wcwcVbD+WMjZV8OPW6w3VJ
-          4xw7xT7/UaYLmh+BfFv6Db1ONoke8o44t3Wn7FphAoGAIqfPw96hSrUsMwPBe532
-          9GNMBUFbboEQ8QD/pwcsCiq59a4sCiY4/bdhbKbGd7LxGvvshYu1ZYsWbqqZih9q
-          56/ECRT5npRpab+5wt/nKr8XWS/g+HFqmnJTu5tfFASwxVCU4bJf7mjVKWQ6o5qa
-          G30XjuHPYFsVJ2DwoVFiBy8=
-          -----END PRIVATE KEY-----
-          EOF
-
-      - name: Dar permisos a la clave privada
-        run: chmod 600 snowflake_rsa_key.p8
-
-      - name: Ejecutar schemachange
+      # 3. Crea un archivo temporal con la clave privada
+      - name: Prepare private key
         env:
-          SNOWFLAKE_ACCOUNT: "fy50488.central-us.azure"
-          SNOWFLAKE_USER: "github_actions_user"
-          SNOWFLAKE_ROLE: "GITHUB_ACTIONS_ROLE"
-          SNOWFLAKE_WAREHOUSE: "PUBLIC_WH"
-          SNOWFLAKE_DATABASE: "BIGIRON_WAREHOUSE"
-          SNOWFLAKE_SCHEMA: "PUBLIC_DEV"
-          SNOWFLAKE_PRIVATE_KEY_PATH: "snowflake_rsa_key.p8"
-        run: schemachange deploy -f "."
+          SF_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
+        run: |
+          echo "$SF_PRIVATE_KEY" > private_key.p8
+          # Ajustamos permisos para que sólo el usuario actual pueda leerlo
+          chmod 600 private_key.p8
 
+      # 4. Ejecuta schemachange usando la clave privada en lugar de la contraseña
+      - name: Run schemachange
+        env:
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_ROLE: ${{ secrets.SF_ROLE }}
+          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+          SF_DATABASE: ${{ secrets.SF_DATABASE }}
+        run: |
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          python --version
+          echo "Step 1: Installing schemachange"
+          pip install schemachange
+          
+          echo "Step 2: Running schemachange with private key"
+          schemachange \
+            -f $GITHUB_WORKSPACE/deploy \
+            -a $SF_ACCOUNT \
+            -u $SF_USERNAME \
+            -r $SF_ROLE \
+            -w $SF_WAREHOUSE \
+            -d $SF_DATABASE \
+            --snowflake-private-key-path private_key.p8 \
+            -c $SF_DATABASE.SCHEMACHANGE.CHANGE_HISTORY \
+            --create-change-history-table
