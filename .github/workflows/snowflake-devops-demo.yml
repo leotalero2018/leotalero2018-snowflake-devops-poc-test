@@ -26,9 +26,8 @@ jobs:
 
       - name: Debug Environment Variables
         run: |
-          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}"
           echo "SF_ACCOUNT=${{ secrets.SF_ACCOUNT }}"
 
       - name: Run schemachange
         run: |
-          schemachange deploy -f deploy -c connections.toml -a ${{ secrets.SF_ACCOUNT }} -u ${{ secrets.SF_USERNAME }} -r ${{ secrets.SF_ROLE }} -w ${{ secrets.SF_WAREHOUSE }} -d ${{ secrets.SF_DATABASE }}
+          schemachange deploy -f deploy -c connections.toml
