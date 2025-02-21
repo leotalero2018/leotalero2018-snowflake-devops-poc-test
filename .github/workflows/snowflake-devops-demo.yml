@@ -57,7 +57,9 @@ jobs:
             --connection-name my_snowflake \
             -f "$GITHUB_WORKSPACE/deploy" \
             --change-history-table BIGIRON_WAREHOUSE.PUBLIC_DEV.CHANGE_HISTORY \
-            --verbose --dry-run
+            --snowflake-database BIGIRON_WAREHOUSE \
+            --snowflake-schema PUBLIC_DEV \
+            --verbose
 
 
             
