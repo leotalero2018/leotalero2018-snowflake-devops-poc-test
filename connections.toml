@@ -1,7 +1,8 @@
 [connections.snowflake]
-account = "${{ secrets.SF_ACCOUNT }}"
-user = "${{ secrets.SF_USERNAME }}"
+account = "fy50488.central-us.azure"
+user = "github_actions_user"
 private_key = "${{ secrets.SF_PRIVATE_KEY }}"
-role = "${{ secrets.SF_ROLE }}"
-warehouse = "${{ secrets.SF_WAREHOUSE }}"
-database = "${{ secrets.SF_DATABASE }}"
+role = "github_actions_user"
+warehouse = "PUBLIC_WH"
+database = "BIGIRON_WAREHOUSE"
+schema= "PUBLIC_DEV"
