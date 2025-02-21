@@ -1,4 +1,4 @@
-name: Deploy Snowflake Changes
+name: Deploy to Snowflake
 
 on:
   push:
@@ -11,7 +11,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,13 +24,11 @@ jobs:
         run: |
           pip install schemachange
 
+      - name: Debug Environment Variables
+        run: |
+          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}"
+          echo "SF_ACCOUNT=${{ secrets.SF_ACCOUNT }}"
+
       - name: Run schemachange
         run: |
-          schemachange deploy -f deploy -c connections.toml -a ${{ secrets.SF_ACCOUNT }}
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SF_USERNAME }}
-          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
-          SNOWFLAKE_ROLE: ${{ secrets.SF_ROLE }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SF_DATABASE }}
+          schemachange deploy -f deploy -c connections.toml -a ${{ secrets.SF_ACCOUNT }} -u ${{ secrets.SF_USERNAME }} -r ${{ secrets.SF_ROLE }} -w ${{ secrets.SF_WAREHOUSE }} -d ${{ secrets.SF_DATABASE }}
