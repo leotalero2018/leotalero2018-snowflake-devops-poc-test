@@ -38,10 +38,19 @@ jobs:
       - name: Install schemachange
         run: pip install schemachange
 
+      - name: Check existing change history table
+        run: |
+          schemachange deploy \
+            --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
+            --connection-name my_snowflake \
+            -f "$GITHUB_WORKSPACE/migrations" \
+            --verbose
+
+
       - name: Run schemachange deploy
         run: |
           schemachange deploy \
             --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
             --connection-name my_snowflake \
             -f "$GITHUB_WORKSPACE/deploy" \
-            
+            -c/--change-history-table
