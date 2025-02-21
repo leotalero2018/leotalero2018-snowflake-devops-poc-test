@@ -41,9 +41,12 @@ jobs:
       - name: Check existing change history table
         run: |
           schemachange deploy \
+          
+          
             --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
             --connection-name my_snowflake \
             -f "$GITHUB_WORKSPACE/deploy" \
+            --change-history-table BIGIRON_WAREHOUSE.PUBLIC_DEV.CHANGE_HISTORY \
             --verbose
 
       - name: Debug schemachange
@@ -56,5 +59,8 @@ jobs:
             --connections-file-path "$GITHUB_WORKSPACE/connections.toml" \
             --connection-name my_snowflake \
             -f "$GITHUB_WORKSPACE/deploy" \
+            --change-history-table BIGIRON_WAREHOUSE.PUBLIC_DEV.CHANGE_HISTORY \
+            --snowflake-database BIGIRON_WAREHOUSE \
+            --snowflake-schema PUBLIC_DEV \
             --verbose
 
